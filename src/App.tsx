@@ -1,38 +1,37 @@
-import { useState } from 'react';
+import { NavLink, Routes, Route, Navigate } from 'react-router-dom';
 import { Focus, Film } from 'lucide-react';
 import ZoomTool from '@/tools/ZoomTool';
 import GifEditor from '@/tools/GifEditor';
 
-type Tool = 'zoom' | 'editor';
-
-const TOOLS: { id: Tool; label: string; icon: typeof Focus }[] = [
-  { id: 'zoom', label: 'Zoom Maker', icon: Focus },
-  { id: 'editor', label: 'GIF Editor', icon: Film },
-];
+const TOOLS = [
+  { path: '/zoom', label: 'Zoom Maker', icon: Focus },
+  { path: '/editor', label: 'GIF Editor', icon: Film },
+] as const;
 
 function App() {
-  const [active, setActive] = useState<Tool>('zoom');
-
   return (
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">DUN DUN DUN</div>
         <nav className="tool-nav">
           {TOOLS.map((tool) => (
-            <button
-              key={tool.id}
-              className={`nav-item ${active === tool.id ? 'active' : ''}`}
-              onClick={() => setActive(tool.id)}
+            <NavLink
+              key={tool.path}
+              to={tool.path}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
               <tool.icon size={15} />
               {tool.label}
-            </button>
+            </NavLink>
           ))}
         </nav>
       </header>
 
-      {active === 'zoom' && <ZoomTool />}
-      {active === 'editor' && <GifEditor />}
+      <Routes>
+        <Route path="/zoom" element={<ZoomTool />} />
+        <Route path="/editor" element={<GifEditor />} />
+        <Route path="*" element={<Navigate to="/zoom" replace />} />
+      </Routes>
 
       <footer className="footer">
         <span>DUN DUN DUN</span>
