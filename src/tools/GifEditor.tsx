@@ -144,6 +144,16 @@ export default function GifEditor() {
         return;
       }
 
+      // Temp canvas for each frame patch — used so drawImage does proper alpha compositing
+      // instead of putImageData which replaces all pixels (including transparent ones)
+      const patchCanvas = document.createElement('canvas');
+      const patchCtx = patchCanvas.getContext('2d');
+      if (!patchCtx) {
+        setError('Could not process this GIF.');
+        setIsLoading(false);
+        return;
+      }
+
       const built: Frame[] = [];
       for (let i = 0; i < parsedFrames.length; i++) {
         const pf = parsedFrames[i];
@@ -153,10 +163,22 @@ export default function GifEditor() {
           pf.dims.height,
         );
 
-        // Composite at native resolution
-        nativeCtx.putImageData(patchImageData, pf.dims.left, pf.dims.top);
+        // Save canvas state for disposal type 3 (restore to previous)
+        let savedState: ImageData | null = null;
+        if (pf.disposalType === 3) {
+          savedState = nativeCtx.getImageData(0, 0, w, h);
+        }
 
-        // Scale down to display size
+        // Put the patch into a temp canvas, then drawImage onto the native canvas.
+        // drawImage alpha-composites, so transparent pixels in the patch keep
+        // the existing content underneath — which is how GIFs actually work.
+        patchCanvas.width = pf.dims.width;
+        patchCanvas.height = pf.dims.height;
+        patchCtx.clearRect(0, 0, patchCanvas.width, patchCanvas.height);
+        patchCtx.putImageData(patchImageData, 0, 0);
+        nativeCtx.drawImage(patchCanvas, pf.dims.left, pf.dims.top);
+
+        // Capture the composited frame, scaled to display size
         scaledCtx.clearRect(0, 0, displayW, displayH);
         scaledCtx.drawImage(nativeCanvas, 0, 0, w, h, 0, 0, displayW, displayH);
         const scaledImageData = scaledCtx.getImageData(0, 0, displayW, displayH);
@@ -167,10 +189,15 @@ export default function GifEditor() {
           delay: pf.delay,
         });
 
-        // Handle disposal: type 2 = restore to background (clear the region)
+        // Handle disposal for the next frame
         if (pf.disposalType === 2) {
+          // Restore to background: fill the frame's region with the GIF background color
           nativeCtx.clearRect(pf.dims.left, pf.dims.top, pf.dims.width, pf.dims.height);
+        } else if (pf.disposalType === 3 && savedState) {
+          // Restore to previous: put back the state before this frame
+          nativeCtx.putImageData(savedState, 0, 0);
         }
+        // Disposal type 0 or 1: leave the canvas as-is for the next frame
       }
 
       framesRef.current = built;
