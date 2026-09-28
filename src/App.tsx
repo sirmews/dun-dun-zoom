@@ -1,6 +1,5 @@
 import { ChangeEvent, PointerEvent, useEffect, useRef, useState } from 'react';
 import {
-  Aperture,
   ArrowDownToLine,
   Crosshair,
   ImagePlus,
@@ -233,11 +232,8 @@ function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div className="brand">
-          <span className="brand-mark"><Aperture size={18} /></span>
-          <span>DUN<span className="brand-dot">·</span>DUN<span className="brand-dot">·</span>DUN</span>
-        </div>
-        <div className="topbar-meta"><span className="status-dot" />Runs locally in your browser</div>
+        <div className="brand">DUN DUN DUN</div>
+        <div className="topbar-meta">Runs locally in your browser</div>
       </header>
 
       <section className="intro">
