@@ -6,7 +6,6 @@ import {
   LoaderCircle,
   Play,
   RefreshCw,
-  Target,
   Upload,
 } from 'lucide-react';
 
@@ -265,8 +264,7 @@ function App() {
                 <canvas ref={canvasRef} className="preview-canvas" />
                 {target && !isPlaying && (
                   <div className="target-marker" style={{ left: `${target.x * 100}%`, top: `${target.y * 100}%` }}>
-                    <Target size={26} />
-                    <span className="target-pulse" />
+                    <Crosshair size={24} />
                   </div>
                 )}
                 {!target && !isPlaying && <div className="canvas-hint">Click where you want the zoom to land</div>}
