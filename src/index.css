@@ -91,8 +91,12 @@ input[type=range] { width:100%; margin:14px 0 5px; accent-color:#fff; height:4px
 .frame-thumb-info { display:flex; justify-content:space-between; align-items:center; padding:5px 7px; background:#1a1a1a; border-top:1px solid #2a2a2a; }
 .frame-thumb-num { color:#fff; font:10px 'DM Mono',monospace; }
 .frame-thumb-delay { color:#777; font:9px 'DM Mono',monospace; }
-.frame-delete { position:absolute; top:5px; right:5px; border:0; background:rgba(20,20,20,.85); color:#e0605a; width:22px; height:22px; display:grid; place-items:center; padding:0; opacity:0; transition:opacity .15s; cursor:pointer; }
-.frame-thumb:hover .frame-delete { opacity:1; }
+.frame-actions { position:absolute; top:5px; right:5px; display:flex; gap:4px; opacity:0; transition:opacity .15s; }
+.frame-thumb:hover .frame-actions { opacity:1; }
+.frame-action { border:0; width:22px; height:22px; display:grid; place-items:center; padding:0; cursor:pointer; transition:background .15s, color .15s; }
+.frame-duplicate { background:rgba(20,20,20,.85); color:#ccc; }
+.frame-duplicate:hover { background:#fff; color:#111; }
+.frame-delete { background:rgba(20,20,20,.85); color:#e0605a; }
 .frame-delete:hover { background:#e0605a; color:#fff; }
 @media (max-width: 900px) { .app-shell { padding:0 22px 24px; }.intro { padding:48px 0 32px; flex-direction:column; align-items:flex-start; }.step-list { width:100%; grid-template-columns:repeat(3,1fr); }.workspace { grid-template-columns:1fr; }.preview-panel { min-height:500px; }.controls-panel { gap:10px; }.action-stack { margin-top:20px; } }
 @media (max-width: 560px) { .topbar { height:62px; }.intro { padding-top:36px; } .step-list { grid-template-columns:1fr; gap:10px; margin-top:26px; }.step, .step + .step { border-left:0; border-top:0; border-bottom:1px solid #2a2a2a; padding:8px 0 10px; }.step small { display:inline; margin-left:8px; }.preview-panel { padding:14px; min-height:430px; }.canvas-wrap { min-height:300px; }.controls-panel { padding:20px; }.footer { flex-direction:column; align-items:flex-start; gap:8px; } }

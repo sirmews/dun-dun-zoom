@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Trash2,
   Upload,
+  Copy,
 } from 'lucide-react';
 
 type Frame = {
@@ -241,6 +242,14 @@ export default function GifEditor() {
     setIsPlaying(false);
   };
 
+  const duplicateFrame = (frameIndex: number) => {
+    const dup: Frame = { ...frames[frameIndex], imageData: frames[frameIndex].imageData };
+    const updated = [...frames.slice(0, frameIndex + 1), dup, ...frames.slice(frameIndex + 1)].map((f, i) => ({ ...f, index: i }));
+    framesRef.current = updated;
+    setFrames(updated);
+    setIsPlaying(false);
+  };
+
   const exportGif = async () => {
     const frameList = framesRef.current;
     const canvas = canvasRef.current;
@@ -395,13 +404,22 @@ export default function GifEditor() {
                   <span className="frame-thumb-num">{i + 1}</span>
                   <span className="frame-thumb-delay">{frame.delay}ms</span>
                 </div>
-                <button
-                  className="frame-delete"
-                  onClick={(e) => { e.stopPropagation(); deleteFrame(i); }}
-                  title="Delete frame"
-                >
-                  <Trash2 size={13} />
-                </button>
+                <div className="frame-actions">
+                  <button
+                    className="frame-action frame-duplicate"
+                    onClick={(e) => { e.stopPropagation(); duplicateFrame(i); }}
+                    title="Duplicate frame"
+                  >
+                    <Copy size={13} />
+                  </button>
+                  <button
+                    className="frame-action frame-delete"
+                    onClick={(e) => { e.stopPropagation(); deleteFrame(i); }}
+                    title="Delete frame"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
