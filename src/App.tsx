@@ -238,8 +238,8 @@ function App() {
 
       <section className="intro">
         <div>
-          <h1>Zoom GIF Maker</h1>
-          <p className="intro-copy">Upload an image, click where you want the zoom to land, and export a GIF. The zoom snaps closer in four steps. Everything runs in your browser.</p>
+          <h1>Dramatic Zoom GIF Maker</h1>
+          <p className="intro-copy">That classic crime-show effect where the camera punches in closer and closer, one snap at a time. Upload an image, click where the zoom should land, and export a GIF. Everything runs in your browser.</p>
         </div>
         <div className="step-list">
           <div className={`step ${imageUrl ? 'active' : ''}`}><span>01</span><div><strong>Upload</strong><small>Choose a photo</small></div></div>
@@ -315,7 +315,7 @@ function App() {
           </div>
           <div className="control-note">
             <div className="note-icon"><Crosshair size={15} /></div>
-            <p><strong>{STEPS} steps</strong><br />The zoom jumps closer in {STEPS} stages, holding on each before snapping to the next.</p>
+            <p><strong>{STEPS}-step punch-in</strong><br />The zoom snaps closer in {STEPS} stages, holding on each before jumping to the next. That's what gives it the dramatic crime-show feel.</p>
           </div>
           <div className="action-stack">
             <button className="play-button" disabled={!imageUrl || !target || isExporting || isPlaying} onClick={() => setIsPlaying(true)}>
