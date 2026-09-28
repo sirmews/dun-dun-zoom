@@ -7,11 +7,8 @@ import {
   LoaderCircle,
   Play,
   RefreshCw,
-  Sparkles,
   Target,
   Upload,
-  WandSparkles,
-  Zap,
 } from 'lucide-react';
 
 type Point = { x: number; y: number };
@@ -245,14 +242,13 @@ function App() {
 
       <section className="intro">
         <div>
-          <div className="eyebrow"><Sparkles size={14} /> Dramatic zoom meme maker</div>
-          <h1>Pick the spot.<br /><em>Let it zoom.</em></h1>
-          <p className="intro-copy">Upload an image, click where the drama lives, and generate a step-by-step zoom GIF — that classic dun-dun-dun reveal. Nothing leaves your device.</p>
+          <h1>Zoom GIF Maker</h1>
+          <p className="intro-copy">Upload an image, click where you want the zoom to land, and export a GIF. The zoom snaps closer in four steps. Everything runs in your browser.</p>
         </div>
         <div className="step-list">
-          <div className={`step ${imageUrl ? 'active' : ''}`}><span>01</span><div><strong>Upload</strong><small>Drop a photo to begin</small></div></div>
-          <div className={`step ${target ? 'active' : ''}`}><span>02</span><div><strong>Pick target</strong><small>Click the spot to zoom</small></div></div>
-          <div className={`step ${exportUrl ? 'active' : ''}`}><span>03</span><div><strong>Make GIF</strong><small>Download the zoom</small></div></div>
+          <div className={`step ${imageUrl ? 'active' : ''}`}><span>01</span><div><strong>Upload</strong><small>Choose a photo</small></div></div>
+          <div className={`step ${target ? 'active' : ''}`}><span>02</span><div><strong>Set target</strong><small>Click where to zoom</small></div></div>
+          <div className={`step ${exportUrl ? 'active' : ''}`}><span>03</span><div><strong>Export</strong><small>Download the GIF</small></div></div>
         </div>
       </section>
 
@@ -261,7 +257,7 @@ function App() {
           <div className="panel-heading">
             <div>
               <span className="section-label">Preview</span>
-              <h2>{isPlaying ? 'Zooming…' : 'Your image'}</h2>
+              <h2>{isPlaying ? 'Zooming' : 'Your image'}</h2>
             </div>
             <span className="preview-badge">
               <span className="live-dot" /> {isPlaying ? 'Playing' : target ? 'Target set' : 'Ready'}
@@ -282,14 +278,14 @@ function App() {
             ) : isLoading ? (
               <div className="empty-state">
                 <LoaderCircle size={28} className="spin empty-icon" />
-                <h3>Optimizing image…</h3>
+                <h3>Optimizing image</h3>
                 <p>Resizing for faster processing and a smaller GIF.</p>
               </div>
             ) : (
               <div className="empty-state">
                 <div className="empty-icon"><ImagePlus size={27} /></div>
-                <h3>Start with a photo</h3>
-                <p>Upload an image, then click the spot you want the dramatic zoom to land on. Large images are resized automatically.</p>
+                <h3>Upload a photo</h3>
+                <p>Pick an image, then click where you want the zoom to land. Large images are resized automatically.</p>
                 <button className="primary-button" onClick={() => fileInputRef.current?.click()}><Upload size={17} /> Choose image</button>
               </div>
             )}
@@ -305,10 +301,9 @@ function App() {
         <aside className="controls-panel panel">
           <div className="panel-heading compact">
             <div>
-              <span className="section-label">Controls</span>
-              <h2>Shape the reveal</h2>
+              <span className="section-label">Settings</span>
+              <h2>Options</h2>
             </div>
-            <Zap size={20} className="muted-icon" />
           </div>
           <div className="control-stack">
             <label className="control">
@@ -324,14 +319,14 @@ function App() {
           </div>
           <div className="control-note">
             <div className="note-icon"><Crosshair size={15} /></div>
-            <p><strong>{STEPS} dramatic steps</strong><br />The zoom snaps closer in stages — each step holds, then punches in. Like a suspense reveal.</p>
+            <p><strong>{STEPS} steps</strong><br />The zoom jumps closer in {STEPS} stages, holding on each before snapping to the next.</p>
           </div>
           <div className="action-stack">
             <button className="play-button" disabled={!imageUrl || !target || isExporting || isPlaying} onClick={() => setIsPlaying(true)}>
               <Play size={17} fill="currentColor" /> Preview zoom
             </button>
             <button className="export-button" disabled={!imageUrl || !target || isExporting} onClick={exportGif}>
-              {isExporting ? <><LoaderCircle size={17} className="spin" /> Creating GIF…</> : <><ArrowDownToLine size={17} /> Create GIF</>}
+              {isExporting ? <><LoaderCircle size={17} className="spin" /> Creating GIF</> : <><ArrowDownToLine size={17} /> Create GIF</>}
             </button>
             {exportUrl && <a className="download-link" href={exportUrl} download="dun-dun-dun.gif">Download your GIF <ArrowDownToLine size={14} /></a>}
             <button className="reset-button" onClick={reset}><RefreshCw size={12} /> Clear and start over</button>
@@ -341,8 +336,8 @@ function App() {
       </section>
 
       <footer className="footer">
-        <span>DUN·DUN·DUN — DRAMATIC ZOOM MEME MAKER</span>
-        <span>Nothing leaves your device.</span>
+        <span>DUN DUN DUN</span>
+        <span>Images are processed locally.</span>
       </footer>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} hidden />
     </main>
