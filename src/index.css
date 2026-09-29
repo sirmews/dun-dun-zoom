@@ -12,6 +12,15 @@ button:disabled { cursor: not-allowed; opacity: .4; }
 .app-shell { max-width: 1360px; min-height: 100vh; margin: 0 auto; padding: 0 44px 30px; }
 .topbar { height: 70px; display:flex; align-items:center; justify-content:space-between; border-bottom: 1px solid #2a2a2a; }
 .brand { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: #fff; }
+.brand-dun-final { display: inline-block; animation: brand-shake 1.6s ease-in-out infinite; animation-delay: 1.2s; }
+@keyframes brand-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  3% { transform: translateX(-2px) rotate(-1.5deg); }
+  6% { transform: translateX(2px) rotate(1.5deg); }
+  9% { transform: translateX(-1.5px) rotate(-1deg); }
+  12% { transform: translateX(1.5px) rotate(1deg); }
+  15% { transform: translateX(0) rotate(0); }
+}
 .topbar-meta, .footer { display:flex; align-items:center; gap: 10px; color: #999; font: 11px 'DM Mono', monospace; text-transform:uppercase; letter-spacing:.03em; }
 .tool-nav { display:flex; gap:4px; }
 .nav-item { display:flex; align-items:center; gap:7px; border:0; background:transparent; color:#777; font:11px 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.06em; padding:8px 14px; transition:color .15s, background .15s; cursor:pointer; }

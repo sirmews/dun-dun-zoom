@@ -12,7 +12,7 @@ function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div className="brand">DUN DUN DUN</div>
+        <div className="brand"><span>DUN</span> <span>DUN</span> <span className="brand-dun-final">DUN</span></div>
         <nav className="tool-nav">
           {TOOLS.map((tool) => (
             <NavLink
