@@ -36,7 +36,6 @@ function App() {
       <footer className="footer">
         <span>DUN DUN DUN</span>
         <span>Made by Nav and free AI credits — <a href="https://perfectlycromulent.dev" target="_blank" rel="noopener noreferrer" style={{ color: '#ccc', textDecoration: 'underline' }}>perfectlycromulent.dev</a></span>
-        <span>Images are processed locally.</span>
       </footer>
     </main>
   );
