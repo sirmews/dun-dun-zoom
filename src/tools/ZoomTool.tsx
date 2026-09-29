@@ -8,6 +8,7 @@ import {
   Upload,
 } from 'lucide-react';
 import ExportButton from '@/components/ExportButton';
+import StepList from '@/components/StepList';
 
 type Point = { x: number; y: number };
 
@@ -237,11 +238,13 @@ export default function ZoomTool() {
           <h1>Zoom GIF Maker</h1>
           <p className="intro-copy">Create a dramatic punch-in effect from any image. Choose where the zoom lands, tune the timing, and export a GIF directly in your browser.</p>
         </div>
-        <div className="step-list">
-          <div className={`step ${imageUrl ? 'active' : ''}`}><span>01</span><div><strong>Upload</strong><small>Choose a photo</small></div></div>
-          <div className={`step ${target ? 'active' : ''}`}><span>02</span><div><strong>Set target</strong><small>Click where to zoom</small></div></div>
-          <div className={`step ${exportUrl ? 'active' : ''}`}><span>03</span><div><strong>Export</strong><small>Download the GIF</small></div></div>
-        </div>
+        <StepList
+          steps={[
+            { label: 'Upload', description: 'Choose a photo', active: Boolean(imageUrl) },
+            { label: 'Set target', description: 'Click where to zoom', active: Boolean(target) },
+            { label: 'Export', description: 'Download the GIF', active: Boolean(exportUrl) },
+          ]}
+        />
       </section>
 
       <section className="workspace">

@@ -11,6 +11,7 @@ import {
   Copy,
 } from 'lucide-react';
 import ExportButton from '@/components/ExportButton';
+import StepList from '@/components/StepList';
 
 type Frame = {
   index: number;
@@ -326,11 +327,13 @@ export default function GifEditor() {
           <h1>GIF Frame Editor</h1>
           <p className="intro-copy">Trim a GIF down to the frames you need. Remove unwanted frames, adjust playback speed, and export a cleaner version directly in your browser.</p>
         </div>
-        <div className="step-list">
-          <div className={`step ${hasGif ? 'active' : ''}`}><span>01</span><div><strong>Upload</strong><small>Drop a GIF</small></div></div>
-          <div className={`step ${hasGif ? 'active' : ''}`}><span>02</span><div><strong>Trim</strong><small>Delete frames</small></div></div>
-          <div className={`step ${exportUrl ? 'active' : ''}`}><span>03</span><div><strong>Export</strong><small>Download GIF</small></div></div>
-        </div>
+        <StepList
+          steps={[
+            { label: 'Upload', description: 'Drop a GIF', active: hasGif },
+            { label: 'Trim', description: 'Delete frames', active: hasGif },
+            { label: 'Export', description: 'Download GIF', active: Boolean(exportUrl) },
+          ]}
+        />
       </section>
 
       <section className="workspace">
