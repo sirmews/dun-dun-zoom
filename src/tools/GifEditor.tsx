@@ -31,6 +31,7 @@ export default function GifEditor() {
   const [gifName, setGifName] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
   const [exportUrl, setExportUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +100,7 @@ export default function GifEditor() {
     }
     if (exportUrl) URL.revokeObjectURL(exportUrl);
     setExportUrl(null);
+    setExportProgress(0);
     setError('');
     setIsLoading(true);
     setFrames([]);
@@ -230,12 +232,19 @@ export default function GifEditor() {
     setIsPlaying((p) => !p);
   };
 
+  const invalidateExport = () => {
+    if (exportUrl) URL.revokeObjectURL(exportUrl);
+    setExportUrl(null);
+    setExportProgress(0);
+  };
+
   const deleteFrame = (frameIndex: number) => {
     if (frames.length <= 1) {
       setError('You need at least one frame.');
       return;
     }
     const updated = frames.filter((_, i) => i !== frameIndex).map((f, i) => ({ ...f, index: i }));
+    invalidateExport();
     framesRef.current = updated;
     setFrames(updated);
     setSelectedFrame(null);
@@ -245,6 +254,7 @@ export default function GifEditor() {
   const duplicateFrame = (frameIndex: number) => {
     const dup: Frame = { ...frames[frameIndex], imageData: frames[frameIndex].imageData };
     const updated = [...frames.slice(0, frameIndex + 1), dup, ...frames.slice(frameIndex + 1)].map((f, i) => ({ ...f, index: i }));
+    invalidateExport();
     framesRef.current = updated;
     setFrames(updated);
     setIsPlaying(false);
@@ -255,6 +265,7 @@ export default function GifEditor() {
     const canvas = canvasRef.current;
     if (!canvas || frameList.length === 0 || isExporting) return;
     setIsExporting(true);
+    setExportProgress(0);
     setError('');
     try {
       const GIF = (await import('gif.js')).default;
@@ -267,18 +278,22 @@ export default function GifEditor() {
         }
         encoder.addFrame(canvas, { copy: true, delay: Math.max(20, Math.round(frameList[i].delay / speed)) });
       }
+      encoder.on('progress', (value: number) => setExportProgress(Math.round(value * 100)));
       encoder.on('finished', (blob: Blob) => {
         setExportUrl(URL.createObjectURL(blob));
+        setExportProgress(100);
         setIsExporting(false);
         drawCurrentFrame(0);
       });
       encoder.on('abort', () => {
         setError('The GIF could not be created. Please try again.');
+        setExportProgress(0);
         setIsExporting(false);
       });
       encoder.render();
     } catch {
       setError('The GIF library failed to load. Please refresh and try again.');
+      setExportProgress(0);
       setIsExporting(false);
     }
   };
@@ -290,6 +305,7 @@ export default function GifEditor() {
     setGifDims({ w: 0, h: 0 });
     setGifName('');
     setExportUrl(null);
+    setExportProgress(0);
     setError('');
     setSelectedFrame(null);
     setIsPlaying(false);
@@ -364,7 +380,7 @@ export default function GifEditor() {
           <div className="control-stack">
             <label className="control">
               <div className="control-title"><span>Playback speed</span><output>{speed.toFixed(2)}×</output></div>
-              <input type="range" min="0.25" max="3" step="0.25" value={speed} onChange={(e) => setSpeed(Number(e.target.value))} />
+              <input type="range" min="0.25" max="3" step="0.25" value={speed} onChange={(e) => { invalidateExport(); setSpeed(Number(e.target.value)); }} />
               <div className="range-labels"><span>Slow</span><span>Fast</span></div>
             </label>
           </div>
@@ -376,10 +392,18 @@ export default function GifEditor() {
             <button className="play-button" disabled={!hasGif} onClick={togglePlay}>
               {isPlaying ? <><Pause size={17} fill="currentColor" /> Pause</> : <><Play size={17} fill="currentColor" /> Play preview</>}
             </button>
-            <button className="export-button" disabled={!hasGif || isExporting} onClick={exportGif}>
-              {isExporting ? <><LoaderCircle size={17} className="spin" /> Creating GIF</> : <><ArrowDownToLine size={17} /> Export GIF</>}
-            </button>
-            {exportUrl && <a className="download-link" href={exportUrl} download="edited.gif">Download your GIF <ArrowDownToLine size={14} /></a>}
+            {exportUrl ? (
+              <a className="export-button export-ready" href={exportUrl} download="edited.gif">
+                <ArrowDownToLine size={17} /> Download
+              </a>
+            ) : (
+              <button className={`export-button ${isExporting ? 'export-progress' : ''}`} disabled={!hasGif || isExporting} onClick={exportGif}>
+                {isExporting && <span className="export-progress-fill" style={{ width: `${exportProgress}%` }} />}
+                <span className="export-button-content">
+                  {isExporting ? <><LoaderCircle size={17} className="spin" /> Creating GIF {exportProgress}%</> : <><ArrowDownToLine size={17} /> Export GIF</>}
+                </span>
+              </button>
+            )}
             <button className="reset-button" onClick={reset}><RefreshCw size={12} /> Clear and start over</button>
           </div>
           {error && <p className="error-message">{error}</p>}
