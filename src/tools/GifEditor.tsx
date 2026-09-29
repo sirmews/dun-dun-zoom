@@ -21,6 +21,11 @@ type Frame = {
 
 const MAX_FILE_MB = 50;
 const CANVAS_W = 800;
+const MAX_CANVAS_H = 1200;
+const MAX_FRAMES = 2000;
+// Every frame is retained as a decoded RGBA buffer (4 bytes per pixel), so the
+// total pixel count across all frames is what actually bounds memory use.
+const MAX_TOTAL_PIXELS = 80_000_000;
 
 export default function GifEditor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -95,6 +100,10 @@ export default function GifEditor() {
 
   const loadGif = async (file?: File) => {
     if (!file) return;
+    if (file.type && file.type !== 'image/gif') {
+      setError('That file is not a GIF. Please choose a GIF file.');
+      return;
+    }
     if (file.size > MAX_FILE_MB * 1024 * 1024) {
       setError(`That GIF is ${(file.size / 1024 / 1024).toFixed(0)} MB. Please choose one under ${MAX_FILE_MB} MB.`);
       return;
@@ -111,6 +120,15 @@ export default function GifEditor() {
 
     try {
       const buffer = await file.arrayBuffer();
+
+      // Confirm the bytes really are a GIF before handing them to the decoder.
+      const signature = String.fromCharCode(...new Uint8Array(buffer.slice(0, 4)));
+      if (signature !== 'GIF8') {
+        setError('That file is not a GIF. Please choose a GIF file.');
+        setIsLoading(false);
+        return;
+      }
+
       const gif = parseGIF(buffer);
       const parsedFrames = decompressFrames(gif, true);
 
@@ -120,11 +138,23 @@ export default function GifEditor() {
         return;
       }
 
+      if (parsedFrames.length > MAX_FRAMES) {
+        setError(`That GIF has ${parsedFrames.length} frames, which is more than this editor can handle. Please choose one with fewer than ${MAX_FRAMES} frames.`);
+        setIsLoading(false);
+        return;
+      }
+
       const w = gif.lsd.width;
       const h = gif.lsd.height;
-      const scale = Math.min(1, CANVAS_W / w);
+      const scale = Math.min(1, CANVAS_W / w, MAX_CANVAS_H / h);
       const displayW = Math.round(w * scale);
       const displayH = Math.round(h * scale);
+
+      if (displayW * displayH * parsedFrames.length > MAX_TOTAL_PIXELS) {
+        setError('That GIF is too large to edit in the browser. Please choose one that is smaller or shorter.');
+        setIsLoading(false);
+        return;
+      }
 
       // Composite each frame at native resolution, then scale down
       const nativeCanvas = document.createElement('canvas');
