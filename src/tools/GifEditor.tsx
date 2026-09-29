@@ -3,15 +3,15 @@ import { parseGIF, decompressFrames } from 'gifuct-js';
 import {
   Film,
   LoaderCircle,
-  Play,
-  Pause,
-  RefreshCw,
-  Trash2,
   Upload,
   Copy,
+  Trash2,
 } from 'lucide-react';
-import ExportButton from '@/components/ExportButton';
 import StepList from '@/components/StepList';
+import ControlsPanel from '@/components/ControlsPanel';
+import RangeControl from '@/components/RangeControl';
+import ControlNote from '@/components/ControlNote';
+import ActionStack from '@/components/ActionStack';
 
 type Frame = {
   index: number;
@@ -373,42 +373,41 @@ export default function GifEditor() {
           </div>
         </div>
 
-        <aside className="controls-panel panel">
-          <div className="panel-heading compact">
-            <div>
-              <span className="section-label">Settings</span>
-              <h2>Options</h2>
-            </div>
-          </div>
+        <ControlsPanel>
           <div className="control-stack">
-            <label className="control">
-              <div className="control-title"><span>Playback speed</span><output>{speed.toFixed(2)}×</output></div>
-              <input type="range" min="0.25" max="3" step="0.25" value={speed} onChange={(e) => { invalidateExport(); setSpeed(Number(e.target.value)); }} />
-              <div className="range-labels"><span>Slow</span><span>Fast</span></div>
-            </label>
-          </div>
-          <div className="control-note">
-            <div className="note-icon"><Film size={15} /></div>
-            <p><strong>{frames.length} frames</strong><br />Total duration: {totalDuration} sec at current speed. Delete frames below to trim the GIF.</p>
-          </div>
-          <div className="action-stack">
-            <button className="play-button" disabled={!hasGif} onClick={togglePlay}>
-              {isPlaying ? <><Pause size={17} fill="currentColor" /> Pause</> : <><Play size={17} fill="currentColor" /> Play preview</>}
-            </button>
-            <ExportButton
-              isExporting={isExporting}
-              exportProgress={exportProgress}
-              exportUrl={exportUrl}
-              disabled={!hasGif}
-              idleLabel="Export GIF"
-              exportLabel="Creating GIF"
-              downloadName="edited.gif"
-              onClick={exportGif}
+            <RangeControl
+              label="Playback speed"
+              value={`${speed.toFixed(2)}×`}
+              min={0.25}
+              max={3}
+              step={0.25}
+              current={speed}
+              onChange={(v) => { invalidateExport(); setSpeed(v); }}
+              lowLabel="Slow"
+              highLabel="Fast"
             />
-            <button className="reset-button" onClick={reset}><RefreshCw size={12} /> Clear and start over</button>
           </div>
-          {error && <p className="error-message">{error}</p>}
-        </aside>
+          <ControlNote icon={Film}>
+            <strong>{frames.length} frames</strong><br />Total duration: {totalDuration} sec at current speed. Delete frames below to trim the GIF.
+          </ControlNote>
+          <ActionStack
+            playLabel="Play preview"
+            playPausedLabel="Pause"
+            isPlaying={isPlaying}
+            playDisabled={!hasGif}
+            onPlay={togglePlay}
+            exportIdleLabel="Export GIF"
+            exportLabel="Creating GIF"
+            downloadName="edited.gif"
+            isExporting={isExporting}
+            exportProgress={exportProgress}
+            exportUrl={exportUrl}
+            exportDisabled={!hasGif}
+            onExport={exportGif}
+            onReset={reset}
+            error={error}
+          />
+        </ControlsPanel>
       </section>
 
       {hasGif && (

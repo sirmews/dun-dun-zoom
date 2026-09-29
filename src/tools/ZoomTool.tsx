@@ -3,12 +3,13 @@ import {
   Crosshair,
   ImagePlus,
   LoaderCircle,
-  Play,
-  RefreshCw,
   Upload,
 } from 'lucide-react';
-import ExportButton from '@/components/ExportButton';
 import StepList from '@/components/StepList';
+import ControlsPanel from '@/components/ControlsPanel';
+import RangeControl from '@/components/RangeControl';
+import ControlNote from '@/components/ControlNote';
+import ActionStack from '@/components/ActionStack';
 
 type Point = { x: number; y: number };
 
@@ -292,47 +293,51 @@ export default function ZoomTool() {
           </div>
         </div>
 
-        <aside className="controls-panel panel">
-          <div className="panel-heading compact">
-            <div>
-              <span className="section-label">Settings</span>
-              <h2>Options</h2>
-            </div>
-          </div>
+        <ControlsPanel>
           <div className="control-stack">
-            <label className="control">
-              <div className="control-title"><span>Zoom depth</span><output>{maxZoom.toFixed(1)}×</output></div>
-              <input type="range" min="2" max="8" step="0.5" value={maxZoom} onChange={(e) => { if (exportUrl) { URL.revokeObjectURL(exportUrl); setExportUrl(null); setExportProgress(0); } setMaxZoom(Number(e.target.value)); }} />
-              <div className="range-labels"><span> Mild</span><span>Extreme</span></div>
-            </label>
-            <label className="control">
-              <div className="control-title"><span>Total duration</span><output>{duration.toFixed(1)} sec</output></div>
-              <input type="range" min="1.5" max="6" step="0.5" value={duration} onChange={(e) => { if (exportUrl) { URL.revokeObjectURL(exportUrl); setExportUrl(null); setExportProgress(0); } setDuration(Number(e.target.value)); }} />
-              <div className="range-labels"><span>Fast</span><span>Slow burn</span></div>
-            </label>
-          </div>
-          <div className="control-note">
-            <div className="note-icon"><Crosshair size={15} /></div>
-            <p><strong>{STEPS}-step punch-in</strong><br />The zoom snaps closer in {STEPS} stages, holding on each before jumping to the next. That's what gives it the dramatic crime-show feel.</p>
-          </div>
-          <div className="action-stack">
-            <button className="play-button" disabled={!imageUrl || !target || isExporting || isPlaying} onClick={() => setIsPlaying(true)}>
-              <Play size={17} fill="currentColor" /> Preview zoom
-            </button>
-            <ExportButton
-              isExporting={isExporting}
-              exportProgress={exportProgress}
-              exportUrl={exportUrl}
-              disabled={!imageUrl || !target}
-              idleLabel="Create GIF"
-              exportLabel="Creating GIF"
-              downloadName="dun-dun-dun.gif"
-              onClick={exportGif}
+            <RangeControl
+              label="Zoom depth"
+              value={`${maxZoom.toFixed(1)}×`}
+              min={2}
+              max={8}
+              step={0.5}
+              current={maxZoom}
+              onChange={(v) => { if (exportUrl) { URL.revokeObjectURL(exportUrl); setExportUrl(null); setExportProgress(0); } setMaxZoom(v); }}
+              lowLabel="Mild"
+              highLabel="Extreme"
             />
-            <button className="reset-button" onClick={reset}><RefreshCw size={12} /> Clear and start over</button>
+            <RangeControl
+              label="Total duration"
+              value={`${duration.toFixed(1)} sec`}
+              min={1.5}
+              max={6}
+              step={0.5}
+              current={duration}
+              onChange={(v) => { if (exportUrl) { URL.revokeObjectURL(exportUrl); setExportUrl(null); setExportProgress(0); } setDuration(v); }}
+              lowLabel="Fast"
+              highLabel="Slow burn"
+            />
           </div>
-          {error && <p className="error-message">{error}</p>}
-        </aside>
+          <ControlNote icon={Crosshair}>
+            <strong>{STEPS}-step punch-in</strong><br />The zoom snaps closer in {STEPS} stages, holding on each before jumping to the next. That's what gives it the dramatic crime-show feel.
+          </ControlNote>
+          <ActionStack
+            playLabel="Preview zoom"
+            isPlaying={false}
+            playDisabled={!imageUrl || !target || isExporting || isPlaying}
+            onPlay={() => setIsPlaying(true)}
+            exportIdleLabel="Create GIF"
+            exportLabel="Creating GIF"
+            downloadName="dun-dun-dun.gif"
+            isExporting={isExporting}
+            exportProgress={exportProgress}
+            exportUrl={exportUrl}
+            exportDisabled={!imageUrl || !target}
+            onExport={exportGif}
+            onReset={reset}
+            error={error}
+          />
+        </ControlsPanel>
       </section>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} hidden />
     </>
