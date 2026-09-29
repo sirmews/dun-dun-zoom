@@ -323,8 +323,8 @@ export default function GifEditor() {
     <>
       <section className="intro">
         <div>
-          <h1>GIF Editor</h1>
-          <p className="intro-copy">Drop in a GIF and trim it down to just the frames you need. Delete unwanted frames, adjust the playback speed, and export a cleaner version. Everything runs in your browser.</p>
+          <h1>GIF Frame Editor</h1>
+          <p className="intro-copy">Trim a GIF down to the frames you need. Remove unwanted frames, adjust playback speed, and export a cleaner version directly in your browser.</p>
         </div>
         <div className="step-list">
           <div className={`step ${hasGif ? 'active' : ''}`}><span>01</span><div><strong>Upload</strong><small>Drop a GIF</small></div></div>

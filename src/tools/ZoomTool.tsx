@@ -234,8 +234,8 @@ export default function ZoomTool() {
     <>
       <section className="intro">
         <div>
-          <h1>Dramatic Zoom GIF Maker</h1>
-          <p className="intro-copy">That classic crime-show effect where the camera punches in closer and closer, one snap at a time. Upload an image, click where the zoom should land, and export a GIF. Everything runs in your browser.</p>
+          <h1>Zoom GIF Maker</h1>
+          <p className="intro-copy">Create a dramatic punch-in effect from any image. Choose where the zoom lands, tune the timing, and export a GIF directly in your browser.</p>
         </div>
         <div className="step-list">
           <div className={`step ${imageUrl ? 'active' : ''}`}><span>01</span><div><strong>Upload</strong><small>Choose a photo</small></div></div>
