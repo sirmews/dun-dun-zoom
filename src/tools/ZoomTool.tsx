@@ -1,6 +1,5 @@
 import { ChangeEvent, PointerEvent, useEffect, useRef, useState } from 'react';
 import {
-  ArrowDownToLine,
   Crosshair,
   ImagePlus,
   LoaderCircle,
@@ -8,6 +7,7 @@ import {
   RefreshCw,
   Upload,
 } from 'lucide-react';
+import ExportButton from '@/components/ExportButton';
 
 type Point = { x: number; y: number };
 
@@ -26,6 +26,7 @@ export default function ZoomTool() {
   const [duration, setDuration] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
   const [exportUrl, setExportUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -116,6 +117,7 @@ export default function ZoomTool() {
     if (imageUrl) URL.revokeObjectURL(imageUrl);
     if (exportUrl) URL.revokeObjectURL(exportUrl);
     setExportUrl(null);
+    setExportProgress(0);
     setError('');
     setIsLoading(true);
     const url = URL.createObjectURL(file);
@@ -185,6 +187,7 @@ export default function ZoomTool() {
       return;
     }
     setIsExporting(true);
+    setExportProgress(0);
     setError('');
     try {
       const GIF = (await import('gif.js')).default;
@@ -195,18 +198,22 @@ export default function ZoomTool() {
         drawFrame(index / (frameCount - 1));
         encoder.addFrame(canvas, { copy: true, delay: frameDelay });
       }
+      encoder.on('progress', (value: number) => setExportProgress(Math.round(value * 100)));
       encoder.on('finished', (blob: Blob) => {
         setExportUrl(URL.createObjectURL(blob));
+        setExportProgress(100);
         setIsExporting(false);
         drawFrame(0);
       });
       encoder.on('abort', () => {
         setError('The GIF could not be created. Please try again.');
+        setExportProgress(0);
         setIsExporting(false);
       });
       encoder.render();
     } catch {
       setError('The GIF library failed to load. Please refresh and try again.');
+      setExportProgress(0);
       setIsExporting(false);
     }
   };
@@ -217,6 +224,7 @@ export default function ZoomTool() {
     setImageUrl(null);
     setImageName('');
     setExportUrl(null);
+    setExportProgress(0);
     setTarget(null);
     setError('');
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -291,12 +299,12 @@ export default function ZoomTool() {
           <div className="control-stack">
             <label className="control">
               <div className="control-title"><span>Zoom depth</span><output>{maxZoom.toFixed(1)}×</output></div>
-              <input type="range" min="2" max="8" step="0.5" value={maxZoom} onChange={(e) => setMaxZoom(Number(e.target.value))} />
+              <input type="range" min="2" max="8" step="0.5" value={maxZoom} onChange={(e) => { if (exportUrl) { URL.revokeObjectURL(exportUrl); setExportUrl(null); setExportProgress(0); } setMaxZoom(Number(e.target.value)); }} />
               <div className="range-labels"><span> Mild</span><span>Extreme</span></div>
             </label>
             <label className="control">
               <div className="control-title"><span>Total duration</span><output>{duration.toFixed(1)} sec</output></div>
-              <input type="range" min="1.5" max="6" step="0.5" value={duration} onChange={(e) => setDuration(Number(e.target.value))} />
+              <input type="range" min="1.5" max="6" step="0.5" value={duration} onChange={(e) => { if (exportUrl) { URL.revokeObjectURL(exportUrl); setExportUrl(null); setExportProgress(0); } setDuration(Number(e.target.value)); }} />
               <div className="range-labels"><span>Fast</span><span>Slow burn</span></div>
             </label>
           </div>
@@ -308,10 +316,16 @@ export default function ZoomTool() {
             <button className="play-button" disabled={!imageUrl || !target || isExporting || isPlaying} onClick={() => setIsPlaying(true)}>
               <Play size={17} fill="currentColor" /> Preview zoom
             </button>
-            <button className="export-button" disabled={!imageUrl || !target || isExporting} onClick={exportGif}>
-              {isExporting ? <><LoaderCircle size={17} className="spin" /> Creating GIF</> : <><ArrowDownToLine size={17} /> Create GIF</>}
-            </button>
-            {exportUrl && <a className="download-link" href={exportUrl} download="dun-dun-dun.gif">Download your GIF <ArrowDownToLine size={14} /></a>}
+            <ExportButton
+              isExporting={isExporting}
+              exportProgress={exportProgress}
+              exportUrl={exportUrl}
+              disabled={!imageUrl || !target}
+              idleLabel="Create GIF"
+              exportLabel="Creating GIF"
+              downloadName="dun-dun-dun.gif"
+              onClick={exportGif}
+            />
             <button className="reset-button" onClick={reset}><RefreshCw size={12} /> Clear and start over</button>
           </div>
           {error && <p className="error-message">{error}</p>}

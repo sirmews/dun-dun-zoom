@@ -1,7 +1,6 @@
 import { ChangeEvent, useEffect, useRef, useState, useCallback } from 'react';
 import { parseGIF, decompressFrames } from 'gifuct-js';
 import {
-  ArrowDownToLine,
   Film,
   LoaderCircle,
   Play,
@@ -11,6 +10,7 @@ import {
   Upload,
   Copy,
 } from 'lucide-react';
+import ExportButton from '@/components/ExportButton';
 
 type Frame = {
   index: number;
@@ -392,18 +392,16 @@ export default function GifEditor() {
             <button className="play-button" disabled={!hasGif} onClick={togglePlay}>
               {isPlaying ? <><Pause size={17} fill="currentColor" /> Pause</> : <><Play size={17} fill="currentColor" /> Play preview</>}
             </button>
-            {exportUrl ? (
-              <a className="export-button export-ready" href={exportUrl} download="edited.gif">
-                <ArrowDownToLine size={17} /> Download
-              </a>
-            ) : (
-              <button className={`export-button ${isExporting ? 'export-progress' : ''}`} disabled={!hasGif || isExporting} onClick={exportGif}>
-                {isExporting && <span className="export-progress-fill" style={{ width: `${exportProgress}%` }} />}
-                <span className="export-button-content">
-                  {isExporting ? <><LoaderCircle size={17} className="spin" /> Creating GIF {exportProgress}%</> : <><ArrowDownToLine size={17} /> Export GIF</>}
-                </span>
-              </button>
-            )}
+            <ExportButton
+              isExporting={isExporting}
+              exportProgress={exportProgress}
+              exportUrl={exportUrl}
+              disabled={!hasGif}
+              idleLabel="Export GIF"
+              exportLabel="Creating GIF"
+              downloadName="edited.gif"
+              onClick={exportGif}
+            />
             <button className="reset-button" onClick={reset}><RefreshCw size={12} /> Clear and start over</button>
           </div>
           {error && <p className="error-message">{error}</p>}

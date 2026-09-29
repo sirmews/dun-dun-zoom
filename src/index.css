@@ -80,8 +80,6 @@ input[type=range] { width:100%; margin:14px 0 5px; accent-color:#fff; height:4px
 .export-ready:hover { background:#ddd; }
 .reset-button { margin-top:4px; background:transparent; border:0; color:#888; font:10px 'DM Mono',monospace; display:flex; align-items:center; justify-content:center; gap:6px; }
 .reset-button:hover { color:#ccc; }
-.download-link { display:flex; justify-content:center; align-items:center; gap:7px; color:#fff; font:11px 'DM Mono',monospace; text-decoration:none; padding:4px; }
-.download-link:hover { color:#ddd; }
 .error-message { color:#e0605a; font-size:11px; margin:13px 0 0; text-align:center; }
 .spin { animation:spin 1s linear infinite; } @keyframes spin { to { transform:rotate(360deg); } }
 .footer { justify-content:space-between; padding-top:28px; font-size:9px; }
