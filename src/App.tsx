@@ -1,11 +1,13 @@
 import { NavLink, Routes, Route, Navigate } from 'react-router-dom';
-import { Focus, Film } from 'lucide-react';
+import { Focus, Film, MessageSquareQuote } from 'lucide-react';
 import ZoomTool from '@/tools/ZoomTool';
 import GifEditor from '@/tools/GifEditor';
+import QuoteTool from '@/tools/QuoteTool';
 
 const TOOLS = [
   { path: '/zoom', label: 'Zoom Maker', icon: Focus },
   { path: '/editor', label: 'GIF Editor', icon: Film },
+  { path: '/quote', label: 'Quote Maker', icon: MessageSquareQuote },
 ] as const;
 
 function App() {
@@ -30,6 +32,7 @@ function App() {
       <Routes>
         <Route path="/zoom" element={<ZoomTool />} />
         <Route path="/editor" element={<GifEditor />} />
+        <Route path="/quote" element={<QuoteTool />} />
         <Route path="*" element={<Navigate to="/zoom" replace />} />
       </Routes>
 
