@@ -3,7 +3,6 @@ import {
   ImagePlus,
   LoaderCircle,
   Upload,
-  MessageSquareQuote,
   Sparkles,
 } from 'lucide-react';
 import StepList from '@/components/StepList';
@@ -68,10 +67,7 @@ export default function QuoteTool() {
       }
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
     } else {
-      const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-      bgGradient.addColorStop(0, '#1a2a3a');
-      bgGradient.addColorStop(1, '#0d1a2a');
-      ctx.fillStyle = bgGradient;
+      ctx.fillStyle = '#0d0d0d';
       ctx.fillRect(0, 0, width, height);
     }
 
@@ -271,25 +267,32 @@ export default function QuoteTool() {
           <div className="panel-heading">
             <div>
               <span className="section-label">Preview</span>
-              <h2>{format.label} ({format.dims})</h2>
+              <h2>{isLoading ? 'Optimizing' : imageUrl ? 'Your image' : 'Upload a photo'}</h2>
             </div>
             <span className="preview-badge">
-              {format.ratio} ratio
+              <span className="live-dot" /> {format.label} · {format.ratio}
             </span>
           </div>
-          <div className={`canvas-wrap ${!imageUrl && !isLoading ? 'empty' : ''} quote-canvas-wrap`}>
-            {isLoading ? (
+          <div className={`canvas-wrap ${!imageUrl ? 'empty' : ''} quote-canvas-wrap`}>
+            {imageUrl ? (
+              <canvas ref={canvasRef} className="preview-canvas" />
+            ) : isLoading ? (
               <div className="empty-state">
                 <LoaderCircle size={28} className="spin empty-icon" />
                 <h3>Optimizing image</h3>
                 <p>Resizing for faster processing.</p>
               </div>
             ) : (
-              <canvas ref={canvasRef} className="preview-canvas quote-preview-canvas" />
+              <div className="empty-state">
+                <div className="empty-icon"><ImagePlus size={27} /></div>
+                <h3>Upload a photo</h3>
+                <p>Pick a background image for your quote. Large images are resized automatically.</p>
+                <button className="primary-button" onClick={() => fileInputRef.current?.click()}><Upload size={17} /> Choose image</button>
+              </div>
             )}
           </div>
           <div className="preview-footer">
-            <span>{imageName || (imageUrl ? 'Background loaded' : 'No background selected')}</span>
+            <span>{imageName || 'No image selected'}</span>
             <button className="text-button" onClick={() => fileInputRef.current?.click()}>
               {imageUrl ? 'Replace image' : 'Browse files'}
             </button>
@@ -376,34 +379,13 @@ export default function QuoteTool() {
             isExporting={false}
             exportProgress={0}
             exportUrl={exportUrl}
-            exportDisabled={!hasContent}
+            exportDisabled={!imageUrl || !hasContent}
             onExport={exportImage}
             onReset={reset}
             error={error}
           />
         </ControlsPanel>
       </section>
-
-      {!imageUrl && !isLoading && (
-        <section className="quote-upload-section">
-          <div className="empty-state inline-upload">
-            <div className="empty-icon"><ImagePlus size={27} /></div>
-            <h3>Add a background image</h3>
-            <p>Optional — your quote will render on a dark gradient if no image is chosen. Either way, you get a perfectly sized image for LinkedIn.</p>
-            <button className="primary-button" onClick={() => fileInputRef.current?.click()}><Upload size={17} /> Choose image</button>
-          </div>
-        </section>
-      )}
-
-      {!hasContent && imageUrl && (
-        <section className="quote-upload-section">
-          <div className="empty-state inline-upload">
-            <div className="empty-icon"><MessageSquareQuote size={27} /></div>
-            <h3>Type your quote</h3>
-            <p>Use the Quote field in the settings panel to add your text. It will appear centered on the preview above.</p>
-          </div>
-        </section>
-      )}
 
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} hidden />
     </>

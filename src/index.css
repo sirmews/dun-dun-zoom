@@ -125,12 +125,6 @@ input[type=range] { width:100%; margin:14px 0 5px; accent-color:#fff; height:4px
 .quote-author-input:focus { outline:0; border-color:#555; }
 .quote-author-input::placeholder { color:#666; }
 .quote-canvas-wrap { cursor:default; }
-.quote-preview-canvas { width:100%; height:auto; max-height:480px; object-fit:contain; }
-.quote-upload-section { margin-top:24px; padding:40px; border:1px dashed #333; background:#161616; display:flex; align-items:center; justify-content:center; }
-.inline-upload { max-width:340px; }
-.inline-upload .empty-icon { width:56px; height:56px; display:grid; place-items:center; margin:0 auto 16px; color:#fff; background:#2a2a2a; }
-.inline-upload h3 { margin:0; color:#fff; font-size:17px; letter-spacing:-.02em; }
-.inline-upload p { margin:8px 0 20px; font-size:12px; line-height:1.6; }
 
 @media (max-width: 900px) { .app-shell { padding:0 22px 24px; }.intro { padding:48px 0 32px; flex-direction:column; align-items:flex-start; }.step-list { width:100%; grid-template-columns:repeat(3,1fr); }.workspace { grid-template-columns:1fr; }.preview-panel { min-height:500px; }.controls-panel { gap:10px; }.action-stack { margin-top:20px; } }
 @media (max-width: 560px) { .topbar { height:62px; }.intro { padding-top:36px; } .step-list { grid-template-columns:1fr; gap:10px; margin-top:26px; }.step, .step + .step { border-left:0; border-top:0; border-bottom:1px solid #2a2a2a; padding:8px 0 10px; }.step small { display:inline; margin-left:8px; }.preview-panel { padding:14px; min-height:430px; }.canvas-wrap { min-height:300px; }.controls-panel { padding:20px; }.footer { flex-direction:column; align-items:flex-start; gap:8px; } }
