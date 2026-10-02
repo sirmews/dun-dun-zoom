@@ -53,22 +53,24 @@ export default function QuoteTool() {
 
     const { width, height } = format;
 
+    ctx.fillStyle = '#0d0d0d';
+    ctx.fillRect(0, 0, width, height);
+
     if (imageRef.current) {
       const img = imageRef.current;
       const imgRatio = img.naturalWidth / img.naturalHeight;
       const canvasRatio = width / height;
-      let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+      let drawW: number, drawH: number;
       if (imgRatio > canvasRatio) {
-        sw = img.naturalHeight * canvasRatio;
-        sx = (img.naturalWidth - sw) / 2;
+        drawW = width;
+        drawH = width / imgRatio;
       } else {
-        sh = img.naturalWidth / canvasRatio;
-        sy = (img.naturalHeight - sh) / 2;
+        drawH = height;
+        drawW = height * imgRatio;
       }
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
-    } else {
-      ctx.fillStyle = '#0d0d0d';
-      ctx.fillRect(0, 0, width, height);
+      const dx = (width - drawW) / 2;
+      const dy = (height - drawH) / 2;
+      ctx.drawImage(img, dx, dy, drawW, drawH);
     }
 
     if (overlayOpacity > 0) {
