@@ -1,8 +1,6 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  ImagePlus,
   LoaderCircle,
-  Upload,
   Sparkles,
 } from 'lucide-react';
 import StepList from '@/components/StepList';
@@ -25,13 +23,18 @@ const FORMATS: Format[] = [
   { id: 'landscape', label: 'Landscape', dims: '1200 × 627', ratio: '1.91:1', width: 1200, height: 627 },
 ];
 
-const MAX_DIM = 1600;
-const MAX_FILE_MB = 25;
+const BACKGROUNDS = [
+  { id: 'dawn', name: 'Dawn', path: '/quote-bg-dawn.webp' },
+  { id: 'coast', name: 'Coast', path: '/quote-bg-coast.webp' },
+  { id: 'architecture', name: 'Architecture', path: '/quote-bg-architecture.webp' },
+  { id: 'forest', name: 'Forest', path: '/quote-bg-forest.webp' },
+  { id: 'desert', name: 'Desert', path: '/quote-bg-desert.webp' },
+] as const;
 
 export default function QuoteTool() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedBackground, setSelectedBackground] = useState<typeof BACKGROUNDS[number]['id']>(BACKGROUNDS[0].id);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageName, setImageName] = useState('');
   const [format, setFormat] = useState<Format>(FORMATS[0]);
@@ -129,63 +132,33 @@ export default function QuoteTool() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageUrl, format, quote, author, fontSize, overlayOpacity]);
 
-  const loadFile = async (file?: File) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    if (file.size > MAX_FILE_MB * 1024 * 1024) {
-      setError(`That image is ${(file.size / 1024 / 1024).toFixed(0)} MB. Please choose one under ${MAX_FILE_MB} MB.`);
-      return;
-    }
-    if (imageUrl) URL.revokeObjectURL(imageUrl);
-    if (exportUrl) URL.revokeObjectURL(exportUrl);
-    setExportUrl(null);
-    setError('');
+  useEffect(() => {
+    const background = BACKGROUNDS.find((item) => item.id === selectedBackground);
+    if (!background) return;
     setIsLoading(true);
-    const url = URL.createObjectURL(file);
+    setImageUrl(null);
     const image = new Image();
     image.onload = () => {
-      const { naturalWidth: w, naturalHeight: h } = image;
-      if (w <= MAX_DIM && h <= MAX_DIM) {
-        imageRef.current = image;
-        setImageUrl(url);
-        setImageName(file.name);
-        setIsLoading(false);
-        return;
-      }
-      const scale = MAX_DIM / Math.max(w, h);
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(w * scale);
-      canvas.height = Math.round(h * scale);
-      const context = canvas.getContext('2d');
-      if (!context) {
-        setIsLoading(false);
-        return;
-      }
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          setIsLoading(false);
-          return;
-        }
-        const compressedUrl = URL.createObjectURL(blob);
-        const compressed = new Image();
-        compressed.onload = () => {
-          imageRef.current = compressed;
-          setImageUrl(compressedUrl);
-          setImageName(file.name);
-          setIsLoading(false);
-          URL.revokeObjectURL(url);
-        };
-        compressed.src = compressedUrl;
-      }, 'image/jpeg', 0.92);
-    };
-    image.onerror = () => {
-      setError('That image could not be loaded. Try a different file.');
+      imageRef.current = image;
+      setImageUrl(background.path);
+      setImageName(background.name);
       setIsLoading(false);
     };
-    image.src = url;
-  };
+    image.onerror = () => {
+      setError('That background could not be loaded. Please choose another.');
+      setIsLoading(false);
+    };
+    image.src = background.path;
+  }, [selectedBackground]);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => loadFile(event.target.files?.[0]);
+  const selectBackground = (background: typeof BACKGROUNDS[number]) => {
+    if (exportUrl) {
+      URL.revokeObjectURL(exportUrl);
+      setExportUrl(null);
+    }
+    setError('');
+    setSelectedBackground(background.id);
+  };
 
   const exportImage = () => {
     const canvas = canvasRef.current;
@@ -206,10 +179,8 @@ export default function QuoteTool() {
   };
 
   const reset = () => {
-    if (imageUrl) URL.revokeObjectURL(imageUrl);
     if (exportUrl) URL.revokeObjectURL(exportUrl);
-    setImageUrl(null);
-    setImageName('');
+    setSelectedBackground(BACKGROUNDS[0].id);
     imageRef.current = null;
     setExportUrl(null);
     setError('');
@@ -218,7 +189,6 @@ export default function QuoteTool() {
     setFontSize(42);
     setOverlayOpacity(55);
     setFormat(FORMATS[0]);
-    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleQuoteChange = (value: string) => {
@@ -264,12 +234,36 @@ export default function QuoteTool() {
         />
       </section>
 
+      <section className="background-picker" aria-label="Choose a background">
+        <div className="background-picker-header">
+          <div>
+            <span className="section-label">Backgrounds</span>
+            <h2>Start with a scene</h2>
+          </div>
+          <span className="background-picker-hint">Scroll to browse</span>
+        </div>
+        <div className="background-strip">
+          {BACKGROUNDS.map((background) => (
+            <button
+              key={background.id}
+              className={`background-card ${selectedBackground === background.id ? 'selected' : ''}`}
+              onClick={() => selectBackground(background)}
+              aria-label={`Use ${background.name} background`}
+              aria-pressed={selectedBackground === background.id}
+            >
+              <img src={background.path} alt="" />
+              <span>{background.name}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       <section className="workspace">
         <div className="preview-panel panel">
           <div className="panel-heading">
             <div>
               <span className="section-label">Preview</span>
-              <h2>{isLoading ? 'Optimizing' : imageUrl ? 'Your image' : 'Upload a photo'}</h2>
+              <h2>{isLoading ? 'Loading background' : 'Your image'}</h2>
             </div>
             <span className="preview-badge">
               <span className="live-dot" /> {format.label} · {format.ratio}
@@ -278,26 +272,17 @@ export default function QuoteTool() {
           <div className={`canvas-wrap ${!imageUrl ? 'empty' : ''} quote-canvas-wrap`}>
             {imageUrl ? (
               <canvas ref={canvasRef} className="preview-canvas" />
-            ) : isLoading ? (
-              <div className="empty-state">
-                <LoaderCircle size={28} className="spin empty-icon" />
-                <h3>Optimizing image</h3>
-                <p>Resizing for faster processing.</p>
-              </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-icon"><ImagePlus size={27} /></div>
-                <h3>Upload a photo</h3>
-                <p>Pick a background image for your quote. Large images are resized automatically.</p>
-                <button className="primary-button" onClick={() => fileInputRef.current?.click()}><Upload size={17} /> Choose image</button>
+                <LoaderCircle size={28} className="spin empty-icon" />
+                <h3>{isLoading ? 'Loading background' : 'Choose a background'}</h3>
+                <p>Select one of the ready-made backgrounds below.</p>
               </div>
             )}
           </div>
           <div className="preview-footer">
-            <span>{imageName || 'No image selected'}</span>
-            <button className="text-button" onClick={() => fileInputRef.current?.click()}>
-              {imageUrl ? 'Replace image' : 'Browse files'}
-            </button>
+            <span>{imageName || 'No background selected'}</span>
+            <span className="preview-footer-note">Choose below</span>
           </div>
         </div>
 
@@ -389,7 +374,7 @@ export default function QuoteTool() {
         </ControlsPanel>
       </section>
 
-      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} hidden />
+
     </>
   );
 }
