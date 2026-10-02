@@ -24,11 +24,12 @@ const FORMATS: Format[] = [
 ];
 
 const BACKGROUNDS = [
-  { id: 'dawn', name: 'Dawn', path: '/quote-bg-dawn.webp' },
-  { id: 'coast', name: 'Coast', path: '/quote-bg-coast.webp' },
-  { id: 'architecture', name: 'Architecture', path: '/quote-bg-architecture.webp' },
-  { id: 'forest', name: 'Forest', path: '/quote-bg-forest.webp' },
-  { id: 'desert', name: 'Desert', path: '/quote-bg-desert.webp' },
+  { id: 'paper', name: 'Paper', path: '/texture-paper.svg' },
+  { id: 'ink', name: 'Ink wash', path: '/texture-ink.svg' },
+  { id: 'linen', name: 'Linen', path: '/texture-linen.svg' },
+  { id: 'grid', name: 'Grid', path: '/texture-grid.svg' },
+  { id: 'clay', name: 'Clay', path: '/texture-clay.svg' },
+  { id: 'charcoal', name: 'Charcoal', path: '/texture-charcoal.svg' },
 ] as const;
 
 export default function QuoteTool() {
@@ -234,30 +235,6 @@ export default function QuoteTool() {
         />
       </section>
 
-      <section className="background-picker" aria-label="Choose a background">
-        <div className="background-picker-header">
-          <div>
-            <span className="section-label">Backgrounds</span>
-            <h2>Start with a scene</h2>
-          </div>
-          <span className="background-picker-hint">Scroll to browse</span>
-        </div>
-        <div className="background-strip">
-          {BACKGROUNDS.map((background) => (
-            <button
-              key={background.id}
-              className={`background-card ${selectedBackground === background.id ? 'selected' : ''}`}
-              onClick={() => selectBackground(background)}
-              aria-label={`Use ${background.name} background`}
-              aria-pressed={selectedBackground === background.id}
-            >
-              <img src={background.path} alt="" />
-              <span>{background.name}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
       <section className="workspace">
         <div className="preview-panel panel">
           <div className="panel-heading">
@@ -283,6 +260,29 @@ export default function QuoteTool() {
           <div className="preview-footer">
             <span>{imageName || 'No background selected'}</span>
             <span className="preview-footer-note">Choose below</span>
+          </div>
+          <div className="background-picker" aria-label="Choose a background">
+            <div className="background-picker-header">
+              <div>
+                <span className="section-label">Textures</span>
+                <h2>Choose a finish</h2>
+              </div>
+              <span className="background-picker-hint">Scroll horizontally</span>
+            </div>
+            <div className="background-strip">
+              {BACKGROUNDS.map((background) => (
+                <button
+                  key={background.id}
+                  className={`background-card ${selectedBackground === background.id ? 'selected' : ''}`}
+                  onClick={() => selectBackground(background)}
+                  aria-label={`Use ${background.name} texture`}
+                  aria-pressed={selectedBackground === background.id}
+                >
+                  <img src={background.path} alt="" />
+                  <span>{background.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
